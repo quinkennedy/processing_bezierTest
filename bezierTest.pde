@@ -3,8 +3,8 @@ import org.apache.batik.svggen.font.table.*;
 import org.apache.batik.svggen.font.*;
 
 int fontSize = 75;
-boolean drawWord = false;
-int groupSize = 12;
+boolean drawWord = true;
+int groupSize = 9;
 
 void setup(){
   size(800, 400);
@@ -17,11 +17,10 @@ void draw(){
   noFill();
   stroke(0);
   //drawString("QUIN KENNEDY");
-  //drawString("JESSICA WONG");
-  drawLines(new String[]{"Paul D Quin", "     +     ", "Vince Blaskovich"});
+  drawLines(new String[]{"My Name Is Quin", "Don't Forget It", "or do, whatever..."});
   //translate(0, fontSize);
-  //drawString("Paul D Quin\n     +     \nVince Blaskovich");
-  //drawFont("Paul D Quin\n     +     \nVince Blaskovich");
+  //drawString("My Name Is Quin\nDon't Forget It\nor do, whatever...");
+  //drawFont("My Name Is Quin\nDon't Forget It\nor do, whatever...");
   //test();
 }
 
