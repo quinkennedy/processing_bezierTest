@@ -6,44 +6,104 @@ import org.apache.batik.svggen.font.*;
 int fontSize = 75;
 boolean drawWord = true;
 int groupSize = 9;
+int fontFidelity = 5;
 ControlP5 cp5;
 boolean needsUpdate = true;
+String[] fontList;
+String fontPath = "/Library/Fonts";
+String currFont = fontPath+"/Ayuthaya.ttf";
 
 void setup(){
   size(800, 400);
   RG.init(this);
+  fontList = getFontList();
   setupControl();
 }
 
 void setupControl(){
   cp5 = new ControlP5(this);
   
-  cp5.addNumberbox("grouping")
+  cp5.addNumberbox("nbGrouping")
      .setPosition(0,0)
      .setSize(100,14)
      .setScrollSensitivity(1.1)
      .setValue(groupSize)
      ;//minimum of 2
-  cp5.addNumberbox("fontSize")
+  cp5.addNumberbox("nbFontSize")
      .setPosition(110, 0)
      .setSize(100, 14)
      .setScrollSensitivity(1.1)
      .setValue(fontSize)
      ;//minimum of.. 1?
-     //also have control over how fine the font is split up?
+  cp5.addNumberbox("nbFontFidelity")
+     .setPosition(220, 0)
+     .setSize(100, 14)
+     .setScrollSensitivity(1.1)
+     .setValue(fontFidelity)
+     ;//minimum of.. 1?
     // create a toggle
-  cp5.addToggle("toggleValue")
-     .setPosition(220,0)
+  cp5.addToggle("tWholeWord")
+     .setPosition(330,0)
      .setSize(50,20)
      .setMode(ControlP5.SWITCH)
+     .setValue(drawWord)
      ;
-  DropdownList d1 = cp5.addDropdownList("myList-d1")
-    .setPosition(280, 20)
+  DropdownList d1 = cp5.addDropdownList("ddlFont")
+    .setPosition(390, 10)
     ;
- 
+    
   //add items to d1
-  d1.addItem("test", 0);
-  d1.addItem("test2", 1);
+  d1.addItems(fontList);
+  //d1.addItem("test", 0);
+  //d1.addItem("test2", 1);
+}
+
+String[] getFontList(){
+  java.io.File folder = new java.io.File(fontPath);
+  java.io.FilenameFilter ttfFilter = new java.io.FilenameFilter(){
+    public boolean accept(File dir, String name){
+      return name.toLowerCase().endsWith(".ttf");
+    }
+  };
+  
+  String[] filenames = folder.list(ttfFilter);
+  return filenames;
+}
+
+public void nbFontSize(int value){
+  if (value != fontSize && value >= 1){
+    fontSize = value;
+    needsUpdate = true;
+  }
+}
+
+public void nbGrouping(int value){
+  if (value != groupSize && value > 1){
+    groupSize = value;
+    needsUpdate = true;
+  }
+}
+
+public void nbFontFidelity(int value){
+  if (value != fontFidelity && value >= 1){
+    fontFidelity = value;
+    needsUpdate = true;
+  }
+}
+
+public void tWholeWord(boolean value){
+  if (value != drawWord){
+    drawWord = value;
+    needsUpdate = true;
+  }
+}
+
+public void ddlFont(int value){
+  println("[ddlFont] " + value);
+  if (value >= 0 && value < fontList.length){
+    currFont = fontPath + "/" + fontList[value];
+    needsUpdate = true;
+  }
 }
 
 void controlEvent(ControlEvent theEvent) {
@@ -56,6 +116,9 @@ void controlEvent(ControlEvent theEvent) {
   if (theEvent.isGroup()) {
     // check if the Event was triggered from a ControlGroup
     println("event from group : "+theEvent.getGroup().getValue()+" from "+theEvent.getGroup());
+    if (theEvent.getGroup().getName().startsWith("ddlFont")){
+      ddlFont(floor(theEvent.getGroup().getValue()));
+    }
   } 
   else if (theEvent.isController()) {
     println("event from controller : "+theEvent.getController().getValue()+" from "+theEvent.getController());
@@ -115,9 +178,9 @@ void drawFont(String s){
   //println("haha");
   pushMatrix();
   translate(fontSize/2, 0);
-  RFont f = new RFont("/Library/Fonts/Ayuthaya.ttf", fontSize, RFont.LEFT);
+  RFont f = new RFont(currFont, fontSize, RFont.LEFT);
   RGroup g = f.toGroup(s);
-  RCommand.setSegmentLength(5);
+  RCommand.setSegmentLength(fontFidelity);
   RCommand.setSegmentator(RCommand.UNIFORMLENGTH);
   g = g.toPolygonGroup();
   RPoint rPoints[] = g.getPoints();
