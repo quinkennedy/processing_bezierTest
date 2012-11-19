@@ -1,3 +1,4 @@
+import controlP5.*;
 import geomerative.*;
 import org.apache.batik.svggen.font.table.*;
 import org.apache.batik.svggen.font.*;
@@ -5,23 +6,75 @@ import org.apache.batik.svggen.font.*;
 int fontSize = 75;
 boolean drawWord = true;
 int groupSize = 9;
+ControlP5 cp5;
+boolean needsUpdate = true;
 
 void setup(){
   size(800, 400);
-  noLoop();
   RG.init(this);
+  setupControl();
+}
+
+void setupControl(){
+  cp5 = new ControlP5(this);
+  
+  cp5.addNumberbox("grouping")
+     .setPosition(0,0)
+     .setSize(100,14)
+     .setScrollSensitivity(1.1)
+     .setValue(groupSize)
+     ;//minimum of 2
+  cp5.addNumberbox("fontSize")
+     .setPosition(110, 0)
+     .setSize(100, 14)
+     .setScrollSensitivity(1.1)
+     .setValue(fontSize)
+     ;//minimum of.. 1?
+     //also have control over how fine the font is split up?
+    // create a toggle
+  cp5.addToggle("toggleValue")
+     .setPosition(220,0)
+     .setSize(50,20)
+     .setMode(ControlP5.SWITCH)
+     ;
+  DropdownList d1 = cp5.addDropdownList("myList-d1")
+    .setPosition(280, 20)
+    ;
+ 
+  //add items to d1
+  d1.addItem("test", 0);
+  d1.addItem("test2", 1);
+}
+
+void controlEvent(ControlEvent theEvent) {
+  // DropdownList is of type ControlGroup.
+  // A controlEvent will be triggered from inside the ControlGroup class.
+  // therefore you need to check the originator of the Event with
+  // if (theEvent.isGroup())
+  // to avoid an error message thrown by controlP5.
+
+  if (theEvent.isGroup()) {
+    // check if the Event was triggered from a ControlGroup
+    println("event from group : "+theEvent.getGroup().getValue()+" from "+theEvent.getGroup());
+  } 
+  else if (theEvent.isController()) {
+    println("event from controller : "+theEvent.getController().getValue()+" from "+theEvent.getController());
+  }
 }
 
 void draw(){
-  background(255);
-  noFill();
-  stroke(0);
-  //drawString("QUIN KENNEDY");
-  drawLines(new String[]{"My Name Is Quin", "Don't Forget It", "or do, whatever..."});
-  //translate(0, fontSize);
-  //drawString("My Name Is Quin\nDon't Forget It\nor do, whatever...");
-  //drawFont("My Name Is Quin\nDon't Forget It\nor do, whatever...");
-  //test();
+  if (needsUpdate){
+    background(255);
+    noFill();
+    stroke(0);
+    //drawString("QUIN KENNEDY");
+    drawLines(new String[]{"My Name Is Quin", "Don't Forget It", "or do, whatever..."});
+    //translate(0, fontSize);
+    //drawString("My Name Is Quin\nDon't Forget It\nor do, whatever...");
+    //drawFont("My Name Is Quin\nDon't Forget It\nor do, whatever...");
+    //test();
+    needsUpdate = false;
+  }
 }
 
 void drawLines(String s[]){
