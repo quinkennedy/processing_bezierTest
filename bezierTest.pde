@@ -12,9 +12,12 @@ boolean needsUpdate = true;
 String[] fontList;
 String fontPath = "/Library/Fonts";
 String currFont = fontPath+"/Ayuthaya.ttf";
+String[] textLines = new String[]{"The quick brown fox jumps over the lazy dog.",
+  "Six of the women quietly gave back prizes to the judge.",
+  "Jay began removing six dozen black quilts with petty flaws."};
 
 void setup(){
-  size(800, 400);
+  size(1200, 400);
   RG.init(this);
   fontList = getFontList();
   setupControl();
@@ -56,8 +59,48 @@ void setupControl(){
   d1.addItems(fontList);
   //d1.addItem("test", 0);
   //d1.addItem("test2", 1);
+  cp5.addTextfield("txt1")
+     .setPosition(500,0)
+     .setSize(100,20)
+     .setFocus(true)
+     .setColor(color(255,0,0))
+     .setText(textLines[0])
+     ;
+  cp5.addTextfield("txt2")
+     .setPosition(610,0)
+     .setSize(100,20)
+     .setFocus(true)
+     .setColor(color(255,0,0))
+     .setText(textLines[1])
+     ;
+  cp5.addTextfield("txt3")
+     .setPosition(720,0)
+     .setSize(100,20)
+     .setFocus(true)
+     .setColor(color(255,0,0))
+     .setText(textLines[2])
+     ;
 }
 
+void checkText(){
+  String curr = cp5.get(Textfield.class, "txt1").getText();
+  if (!curr.equals(textLines[0]) && trim(curr).length() > 0){
+    textLines[0] = curr;
+    needsUpdate = true;
+  }
+  curr = trim(cp5.get(Textfield.class, "txt2").getText());
+  if (!curr.equals(textLines[1]) && trim(curr).length() > 0){
+    textLines[1] = curr;
+    needsUpdate = true;
+  }
+  curr = trim(cp5.get(Textfield.class, "txt3").getText());
+  if (!curr.equals(textLines[2]) && trim(curr).length() > 0){
+    textLines[2] = curr;
+    needsUpdate = true;
+  }
+}
+
+//adapted from http://wiki.processing.org/w/Listing_files
 String[] getFontList(){
   java.io.File folder = new java.io.File(fontPath);
   java.io.FilenameFilter ttfFilter = new java.io.FilenameFilter(){
@@ -106,6 +149,19 @@ public void ddlFont(int value){
   }
 }
 
+public void txt1(String value){
+  textLines[0] = value;
+  needsUpdate = true;
+}
+public void txt2(String value){
+  textLines[1] = value;
+  needsUpdate = true;
+}
+public void txt3(String value){
+  textLines[2] = value;
+  needsUpdate = true;
+}
+
 void controlEvent(ControlEvent theEvent) {
   // DropdownList is of type ControlGroup.
   // A controlEvent will be triggered from inside the ControlGroup class.
@@ -126,12 +182,13 @@ void controlEvent(ControlEvent theEvent) {
 }
 
 void draw(){
+  checkText();
   if (needsUpdate){
     background(255);
     noFill();
     stroke(0);
     //drawString("QUIN KENNEDY");
-    drawLines(new String[]{"My Name Is Quin", "Don't Forget It", "or do, whatever..."});
+    drawLines(textLines);
     //translate(0, fontSize);
     //drawString("My Name Is Quin\nDon't Forget It\nor do, whatever...");
     //drawFont("My Name Is Quin\nDon't Forget It\nor do, whatever...");
